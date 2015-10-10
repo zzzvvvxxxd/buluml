@@ -22,19 +22,14 @@ class Dictionary(object):
     PUNCTUATION = ['(', ')', ':', ';', ',', '-', '!', '.', '?', '/', '"', '*']
     CARRIAGE_RETURNS = ['\n', '\r\n']
 
-    def __init__(self, path):
-        self.path = path                    # not use for now
-        self.file_list = []
-        self.__load_file()
-
+    def __init__(self):
         self.word_num = 0
-        self._dictionary = defaultdict(int)         # TF dictionary
+        self._tf = defaultdict(int)                 # global TF dictionary
         self._token2id = defaultdict(int)            # token2id
         #stop words
         self._stopword = None
 
         # init dictionary
-        self.__load()
 
     def is_punc(self, word):
         """
@@ -51,29 +46,15 @@ class Dictionary(object):
         # sent to word list
         return sent.lower().split()
 
-    def __load_file(self):
-        if os.path.isfile(self.path) and os.path.exists(self.path):
-            # single file
-            self.file_list.append(self.path)
-        elif os.path.isdir(self.path) and os.path.exists(self.path):
-            # directory
-            for filename in os.listdir(self.path):
-                self.file_list.append(os.path.join(self.path, filename))
-        else:
-            raise CorpusPathError(self.path)
-        return
-
-    def __load(self):
+    def fit(self, docs):
         # 统计TF 词频
-        for filename in self.file_list:
-            with open(filename) as f:
-                for line in f:
-                    words = self.tokenize(line)        # 暂时简单实用split
-                    for word in words:
-                        clean = self.is_punc(word)
-                        # clean <= 有意义的词
-                        if clean : self._dictionary[clean] += 1
-        word_list = self._dictionary.keys()
+        for doc in docs:
+            words = self.tokenize(doc)        # 暂时简单实用split
+            for word in words:
+                clean = self.is_punc(word)
+                # clean <= 有意义的词
+                if clean : self._tf[clean] += 1
+        word_list = self._tf.keys()
         # token -> tid
         for i in range(len(word_list)):
             self._token2id[word_list[i]] = i
@@ -84,8 +65,8 @@ class Dictionary(object):
             tokens = self.tokenize(item)
         if type(item) == list:
             tokens = item
-        doc = dict([(self._token2id[token], self._dictionary[token]) for token in tokens if self._dictionary[token] > 0])
-        print doc
+        doc = dict([(self._token2id[token], self._tf[token]) for token in tokens if self._tf[token] > 0])
+        return doc
 
     def save(self, filename):
         """
@@ -110,12 +91,28 @@ class Dictionary(object):
 
 
 class Corpus(object):
-    def __init__(self):
+    def __init__(self, path):
         self.doc = list()
+        self.path = path
+        self.file_list = []
+        self.__load_file()
 
     def load(self):
         pass
 
+    def __load_file(self):
+        if os.path.isfile(self.path) and os.path.exists(self.path):
+            # single file
+            self.file_list.append(self.path)
+        elif os.path.isdir(self.path) and os.path.exists(self.path):
+            # directory
+            for filename in os.listdir(self.path):
+                self.file_list.append(os.path.join(self.path, filename))
+        else:
+            raise CorpusPathError(self.path)
+        return
+
 
 if __name__ == "__main__":
-    pass
+    corpus = Corpus("../data/topic/corpus")
+    print corpus.file_list
