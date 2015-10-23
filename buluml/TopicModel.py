@@ -39,4 +39,5 @@ class pLSA():
 
 if __name__ == "__main__":
     corpus = Corpus("../data/topic/corpus")
+    print corpus.getVocab()
     plsa = pLSA(corpus, 5)
