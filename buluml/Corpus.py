@@ -2,6 +2,7 @@
 __author__ = 'LoveLYJ'
 
 import os
+import numpy as np
 import StringIO
 import cPickle as pickle
 from collections import defaultdict
@@ -13,14 +14,14 @@ class Dictionary(object):
     PUNCTUATION = ['(', ')', ':', ';', ',', '-', '!', '.', '?', '/', '"', '*']
     CARRIAGE_RETURNS = ['\n', '\r\n']
 
-    def __init__(self):
+    def __init__(self, path):
         self.word_num = 0
         self._tf = defaultdict(int)                  # global TF dictionary
-        self._token2id = defaultdict(int)            # token2id
+        self._token2id = dict()            # token2id
         #stop words
         self._stopword = set()
         # load stopwords
-        with open("../../data/stopwords.txt") as f:
+        with open(path) as f:
             for word in f:
                 self._stopword.add(word.strip())
         # init dictionary
@@ -60,13 +61,20 @@ class Dictionary(object):
             self._token2id[word_list[i]] = i
 
     def __getitem__(self, item):
-        print item
         tokens = None
         if type(item) == str:
-            tokens = self.tokenize(item)
+            tokens = self.tokenize(item.strip())
         if type(item) == list:
             tokens = item
-        doc = dict([(self._token2id[token], self._tf[token]) for token in tokens if self._tf[token] > 0])
+        doc = np.zeros(len(self._tf.keys()))
+        # doc = [0] * len(self._tf.keys())
+        for token in tokens:
+            # 这里用try except来提速，避免了类似token in set这样的判断
+            try:
+                doc[self._token2id[token]] = 1
+            except:
+                continue
+        # doc = dict([(self._token2id[token], self._tf[token]) for token in tokens if self._tf[token] > 0])
         return doc
 
     @classmethod
@@ -88,7 +96,8 @@ class Dictionary(object):
         try:
             pickle.dump(self, file(filename, "w"))
         except:
-            print "Error"
+            print("Error")
+
 """
 Corpus类
 读取语料
