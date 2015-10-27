@@ -20,7 +20,7 @@ class Dictionary(object):
         #stop words
         self._stopword = set()
         # load stopwords
-        with open("../data/stopwords.txt") as f:
+        with open("../../data/stopwords.txt") as f:
             for word in f:
                 self._stopword.add(word.strip())
         # init dictionary
@@ -49,6 +49,10 @@ class Dictionary(object):
                 clean = self.__filter(word)
                 # clean <= 有意义的词
                 if clean : self._tf[clean] += 1
+        # 默认删除freq <= 1的词
+        for word in self._tf.keys():
+            if self._tf[word] <= 1:
+                del self._tf[word]
         word_list = self._tf.keys()
         self.word_num = len(word_list)
         # token -> tid
@@ -56,6 +60,7 @@ class Dictionary(object):
             self._token2id[word_list[i]] = i
 
     def __getitem__(self, item):
+        print item
         tokens = None
         if type(item) == str:
             tokens = self.tokenize(item)
@@ -117,8 +122,8 @@ class Corpus(object):
         return
 
     def __load(self):
-        if len(self.file_list) > 1:
-            # 多个文件，默认每个文件是一个doc
+        # 多个文件，默认每个文件是一个doc
+        if os.path.isdir(self.path) and len(self.file_list) > 0:
             for filename in self.file_list:
                 with open(filename) as f:
                     doc = StringIO.StringIO()
@@ -126,7 +131,14 @@ class Corpus(object):
                         if len(line) > 0:
                             doc.write(line.strip() + " ")
                     self.docs.append(doc.getvalue())
-            self.dictionary.fit(self.docs)
+        # single file: each line is a single doc
+        if os.path.isfile(self.path):
+            with open(self.path) as f:
+                for line in f:
+                    if len(line) > 0:
+                        self.docs.append(line.strip())
+        self.dictionary.fit(self.docs)
+        # end __load
 
     def __doc2id(self):
         for doc in self.docs:
