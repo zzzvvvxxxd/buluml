@@ -57,13 +57,13 @@ nb.predict(x_t, y_t)
 ```
 
 效果：
-> 0.969 on test corpus
+> **0.969** on test corpus
 
  
 性能（训练语料/data/spam_email/spam_train.txt）：
 
-> 加载字典： 14.3309998512
-  训练： 0.146000146866
+> 加载字典： 14.3309998512 s   
+  训练： 0.146000146866 s   
 
  效果还不错
 
