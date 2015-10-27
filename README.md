@@ -17,6 +17,18 @@ or 下载源码
 
 ##Naive Bayes
 
+效果：
+> **0.969** on test corpus
+
+ 
+性能（训练语料/data/spam_email/spam_train.txt）：
+
+> 加载字典： 14.3309998512 s   
+  训练： 0.146000146866 s   
+
+ 效果还不错
+
+
 ```python
 from buluml.Corpus import Dictionary
 from buluml.naive_bayes import BasicNB
@@ -55,17 +67,6 @@ with open("./data/spam_email/spam_test.txt") as f:
 x_t = [dictionary[text] for text in x_t]
 nb.predict(x_t, y_t)
 ```
-
-效果：
-> **0.969** on test corpus
-
- 
-性能（训练语料/data/spam_email/spam_train.txt）：
-
-> 加载字典： 14.3309998512 s   
-  训练： 0.146000146866 s   
-
- 效果还不错
 
  ----
  
