@@ -15,7 +15,7 @@ or 下载源码
 
 # Demo
 
-###Naive Bayes
+##Naive Bayes
 
 ```python
 from buluml.Corpus import Dictionary
@@ -67,7 +67,9 @@ nb.predict(x_t, y_t)
 
  效果还不错
 
-###Logistic 
+ ----
+ 
+##Logistic 
 
 ```
 from buluml.LogisticRegression import LogisticRegression
